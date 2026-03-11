@@ -6,9 +6,10 @@ import java.util.Map;
 public class ExchangeRateHostLatestResponse {
 
     private Boolean success;
-    private String base;
-    private String date;
-    private Map<String, BigDecimal> rates;
+    private Long timestamp;
+    private String source;
+    private Map<String, BigDecimal> quotes;
+    private ExchangeRateHostError error;
 
     public Boolean getSuccess() {
         return success;
@@ -18,27 +19,35 @@ public class ExchangeRateHostLatestResponse {
         this.success = success;
     }
 
-    public String getBase() {
-        return base;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setBase(String base) {
-        this.base = base;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getDate() {
-        return date;
+    public String getSource() {
+        return source;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public Map<String, BigDecimal> getRates() {
-        return rates;
+    public Map<String, BigDecimal> getQuotes() {
+        return quotes;
     }
 
-    public void setRates(Map<String, BigDecimal> rates) {
-        this.rates = rates;
+    public void setQuotes(Map<String, BigDecimal> quotes) {
+        this.quotes = quotes;
+    }
+
+    public ExchangeRateHostError getError() {
+        return error;
+    }
+
+    public void setError(ExchangeRateHostError error) {
+        this.error = error;
     }
 }

@@ -20,4 +20,5 @@ springdoc:
 exchange-rate:
   provider:
     base-url: https://api.exchangerate.host
+    access-key: YOUR_API_KEY
     timeout-seconds: 10

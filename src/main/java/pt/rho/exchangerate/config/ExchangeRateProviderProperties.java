@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ExchangeRateProviderProperties {
 
     private String baseUrl;
+    private String accessKey;
     private int timeoutSeconds;
 
     public String getBaseUrl() {
@@ -14,6 +15,14 @@ public class ExchangeRateProviderProperties {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
     }
 
     public int getTimeoutSeconds() {
