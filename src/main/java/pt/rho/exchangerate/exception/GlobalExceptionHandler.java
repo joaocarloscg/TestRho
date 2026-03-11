@@ -12,30 +12,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidCurrencyException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidCurrency(
-            InvalidCurrencyException ex,
-            HttpServletRequest request) {
+	@ExceptionHandler(ApiException.class)
+	public ResponseEntity<ApiErrorResponse> handleApiException(
+	        ApiException ex,
+	        HttpServletRequest request) {
 
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(ExchangeRateNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleExchangeRateNotFound(
-            ExchangeRateNotFoundException ex,
-            HttpServletRequest request) {
-
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(ExternalProviderException.class)
-    public ResponseEntity<ApiErrorResponse> handleExternalProvider(
-            ExternalProviderException ex,
-            HttpServletRequest request) {
-
-        return buildErrorResponse(HttpStatus.BAD_GATEWAY, ex.getMessage(), request.getRequestURI());
-    }
-
+	    return buildErrorResponse(ex.getHttpStatus(), ex.getMessage(), request.getRequestURI());
+	}
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex,
@@ -47,7 +31,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
     }
-
+    
     private ResponseEntity<ApiErrorResponse> buildErrorResponse(
             HttpStatus status,
             String message,
