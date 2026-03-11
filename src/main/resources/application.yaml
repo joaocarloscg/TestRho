@@ -1,3 +1,23 @@
 spring:
   application:
     name: exchange-rate-api
+  cache:
+    type: simple
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+exchange-rate:
+  provider:
+    base-url: https://api.exchangerate.host
+    timeout-seconds: 10
