@@ -1,0 +1,8 @@
+services:
+  exchange-rate-api:
+    build: .
+    container_name: exchange-rate-api
+    ports:
+      - "8080:8080"
+    environment:
+      EXCHANGE_RATE_PROVIDER_ACCESS_KEY: ${EXCHANGE_RATE_PROVIDER_ACCESS_KEY}
