@@ -48,8 +48,9 @@ Optional authentication settings:
 After setting the required environment variable:
 
 ```bash
-AUTH_DEFAULT_API_KEY=replace-with-a-long-random-secret \
-EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_api_key_here \
+EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_provider_api_key_here
+AUTH_DEFAULT_API_KEY=your_internal_api_key_here
+
 ./mvnw spring-boot:run
 ```
 
@@ -67,8 +68,8 @@ docker build -t exchange-rate-api .
 
 ```bash
 docker run -p 8080:8080 \
-  -e EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_api_key_here \
-  -e AUTH_DEFAULT_API_KEY=replace-with-a-long-random-secret \
+  -e EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_provider_api_key_here \
+  -e AUTH_DEFAULT_API_KEY=your_internal_api_key_here \
   exchange-rate-api
 ```
 
