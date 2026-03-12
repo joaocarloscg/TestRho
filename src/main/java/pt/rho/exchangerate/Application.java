@@ -1,16 +1,18 @@
 package pt.rho.exchangerate;
 
-import pt.rho.exchangerate.config.ExchangeRateProviderProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import pt.rho.exchangerate.config.ApplicationProperties;
+import pt.rho.exchangerate.config.RateLimitProperties;
+
 @SpringBootApplication
-@EnableConfigurationProperties(ExchangeRateProviderProperties.class)
-public class ExchangeRateApiApplication {
+@EnableConfigurationProperties({ ApplicationProperties.class, RateLimitProperties.class })
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ExchangeRateApiApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }

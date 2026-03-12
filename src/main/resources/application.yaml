@@ -2,16 +2,26 @@ spring:
   application:
     name: exchange-rate-api
   cache:
-    type: simple
+    type: caffeine
+    cache-names: exchangeRates
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=1m
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,caches
+
+logging:
+  level:
+    root: INFO
+    pt.rho.exchangerate: DEBUG
+    org.springframework.web.client: DEBUG
+    org.springframework.web: INFO
 
 springdoc:
   swagger-ui:
@@ -20,5 +30,13 @@ springdoc:
 exchange-rate:
   provider:
     base-url: https://api.exchangerate.host
-    access-key: YOUR_API_KEY
-    timeout-seconds: 10
+    timeout-seconds: 30
+    access-key: ${EXCHANGE_RATE_PROVIDER_ACCESS_KEY:}
+
+rate-limit:
+  enabled: true
+  capacity: 60
+  refill-tokens: 60
+  refill-duration-minutes: 1
+  bucket-cache-max-size: 10000
+  bucket-cache-expire-after-access-minutes: 60

@@ -1,167 +1,116 @@
 package pt.rho.exchangerate.service;
 
-import pt.rho.exchangerate.client.ExchangeRateClient;
-import pt.rho.exchangerate.dto.external.ExchangeRateHostLatestResponse;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import pt.rho.exchangerate.exception.ExchangeRateNotFoundException;
-import pt.rho.exchangerate.exception.ExternalProviderException;
 import pt.rho.exchangerate.exception.InvalidAmountException;
 import pt.rho.exchangerate.exception.InvalidRequestException;
 import pt.rho.exchangerate.model.ConversionResult;
+import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.validation.CurrencyValidator;
 
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Service
 public class DefaultExchangeRateService implements ExchangeRateService {
 
-    private final ExchangeRateClient exchangeRateClient;
-    private final CurrencyValidator currencyValidator;
+	private final CachedProviderService cachedProviderService;
+	private final CurrencyValidator currencyValidator;
 
-    public DefaultExchangeRateService(ExchangeRateClient exchangeRateClient,
-                                      CurrencyValidator currencyValidator) {
-        this.exchangeRateClient = exchangeRateClient;
-        this.currencyValidator = currencyValidator;
-    }
+	public DefaultExchangeRateService(CachedProviderService cachedProviderService,
+			CurrencyValidator currencyValidator) {
+		this.cachedProviderService = cachedProviderService;
+		this.currencyValidator = currencyValidator;
+	}
 
-    @Override
-    public ExchangeRates getAllRates(String baseCurrency) {
-        String normalizedBaseCurrency = currencyValidator.normalizeAndValidate(baseCurrency);
+	@Override
+	public ExchangeRates getAllRates(String baseCurrency) {
+		String normalizedBaseCurrency = currencyValidator.validateAndNormalize(baseCurrency);
 
-        ExchangeRateHostLatestResponse response =
-                exchangeRateClient.getLatestRates(normalizedBaseCurrency);
+		return cachedProviderService.getAllRates(normalizedBaseCurrency);
+	}
 
-        Map<String, BigDecimal> normalizedRates = extractRates(normalizedBaseCurrency, response);
+	@Override
+	public ExchangeRateResult getExchangeRate(String fromCurrency, String toCurrency) {
+		String normalizedFromCurrency = currencyValidator.validateAndNormalize(fromCurrency);
+		String normalizedToCurrency = currencyValidator.validateAndNormalize(toCurrency);
 
-        return new ExchangeRates(normalizedBaseCurrency, normalizedRates);
-    }
+		ExchangeRates exchangeRates = cachedProviderService.getAllRates(normalizedFromCurrency);
 
-    @Override
-    public BigDecimal getExchangeRate(String fromCurrency, String toCurrency) {
-        String normalizedFromCurrency = currencyValidator.normalizeAndValidate(fromCurrency);
-        String normalizedToCurrency = currencyValidator.normalizeAndValidate(toCurrency);
+		BigDecimal rate = exchangeRates.getRates().get(normalizedToCurrency);
 
-        ExchangeRates exchangeRates = getAllRates(normalizedFromCurrency);
+		if (rate == null) {
+			throw new ExchangeRateNotFoundException(
+					"Exchange rate not found from " + normalizedFromCurrency + " to " + normalizedToCurrency);
+		}
 
-        BigDecimal rate = exchangeRates.getRates().get(normalizedToCurrency);
+		return new ExchangeRateResult(normalizedFromCurrency, normalizedToCurrency, rate);
+	}
 
-        if (rate == null) {
-            throw new ExchangeRateNotFoundException(
-                    "Exchange rate not found from " + normalizedFromCurrency + " to " + normalizedToCurrency);
-        }
+	@Override
+	public ConversionResult convert(String fromCurrency, String toCurrency, BigDecimal amount) {
+		validateConversionAmount(amount);
 
-        return rate;
-    }
+		String normalizedFromCurrency = currencyValidator.validateAndNormalize(fromCurrency);
+		String normalizedToCurrency = currencyValidator.validateAndNormalize(toCurrency);
 
-    @Override
-    public ConversionResult convert(String fromCurrency, String toCurrency, BigDecimal amount) {
-        validateAmount(amount);
+		ExchangeRates exchangeRates = cachedProviderService.getAllRates(normalizedFromCurrency);
 
-        String normalizedFromCurrency = currencyValidator.normalizeAndValidate(fromCurrency);
-        String normalizedToCurrency = currencyValidator.normalizeAndValidate(toCurrency);
+		BigDecimal rate = exchangeRates.getRates().get(normalizedToCurrency);
 
-        BigDecimal rate = getExchangeRate(normalizedFromCurrency, normalizedToCurrency);
-        BigDecimal convertedAmount = calculateConvertedAmount(amount, rate);
+		if (rate == null) {
+			throw new ExchangeRateNotFoundException(
+					"Exchange rate not found from " + normalizedFromCurrency + " to " + normalizedToCurrency);
+		}
 
-        return new ConversionResult(
-                normalizedFromCurrency,
-                normalizedToCurrency,
-                amount,
-                rate,
-                convertedAmount
-        );
-    }
-    
-    @Override
-    public MultiConversionResult convert(String fromCurrency, List<String> toCurrencies, BigDecimal amount) {
-        validateAmount(amount);
+		BigDecimal convertedAmount = calculateConvertedAmount(amount, rate);
 
-        String normalizedFromCurrency = currencyValidator.normalizeAndValidate(fromCurrency);
-        
-        if (toCurrencies == null || toCurrencies.isEmpty()) {
-            throw new InvalidRequestException("Target currencies must not be empty");
-        }
+		return new ConversionResult(normalizedFromCurrency, normalizedToCurrency, amount, rate, convertedAmount);
+	}
 
-        ExchangeRates exchangeRates = getAllRates(normalizedFromCurrency);
+	@Override
+	public MultiConversionResult convert(String fromCurrency, List<String> toCurrencies, BigDecimal amount) {
+		validateConversionAmount(amount);
 
-        List<ConversionResult> conversions = toCurrencies.stream()
-                .map(currencyValidator::normalizeAndValidate)
-                .distinct()
-                .map(toCurrency -> {
-                    BigDecimal rate = exchangeRates.getRates().get(toCurrency);
+		String normalizedFromCurrency = currencyValidator.validateAndNormalize(fromCurrency);
 
-                    if (rate == null) {
-                        throw new ExchangeRateNotFoundException(
-                                "Exchange rate not found from " + normalizedFromCurrency + " to " + toCurrency);
-                    }
+		if (toCurrencies == null || toCurrencies.isEmpty()) {
+			throw new InvalidRequestException("Target currencies must not be empty");
+		}
 
-                    return new ConversionResult(
-                            normalizedFromCurrency,
-                            toCurrency,
-                            amount,
-                            rate,
-                            calculateConvertedAmount(amount, rate)
-                    );
-                })
-                .toList();
+		ExchangeRates exchangeRates = cachedProviderService.getAllRates(normalizedFromCurrency);
 
-        return new MultiConversionResult(normalizedFromCurrency, amount, conversions);
-    }
+		List<ConversionResult> conversions = toCurrencies.stream().map(currencyValidator::validateAndNormalize)
+				.distinct().map(toCurrency -> {
+					BigDecimal rate = exchangeRates.getRates().get(toCurrency);
 
-    private Map<String, BigDecimal> extractRates(String baseCurrency,
-                                                 ExchangeRateHostLatestResponse response) {
-        if (response == null) {
-            throw new ExternalProviderException("No response received from exchange rate provider");
-        }
+					if (rate == null) {
+						throw new ExchangeRateNotFoundException(
+								"Exchange rate not found from " + normalizedFromCurrency + " to " + toCurrency);
+					}
 
-        if (Boolean.FALSE.equals(response.getSuccess())) {
-            /*/
-        	String errorMessage = response.getError() != null
-                    ? response.getError().getInfo()
-                    : "External provider returned an unsuccessful response";
+					return new ConversionResult(normalizedFromCurrency, toCurrency, amount, rate,
+							calculateConvertedAmount(amount, rate));
+				}).toList();
 
-            throw new ExternalProviderException(errorMessage);
-            /*/
-            throw new ExternalProviderException("Failed to fetch exchange rates from external provider");
-            //*/
-        }
+		return new MultiConversionResult(normalizedFromCurrency, amount, conversions);
+	}
 
-        if (response.getQuotes() == null || response.getQuotes().isEmpty()) {
-            throw new ExternalProviderException("No exchange rates returned by external provider");
-        }
+	private void validateConversionAmount(BigDecimal amount) {
+		if (amount == null) {
+			throw new InvalidAmountException("Amount must not be null");
+		}
 
-        Map<String, BigDecimal> extractedRates = response.getQuotes().entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().startsWith(baseCurrency))
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().substring(baseCurrency.length()),
-                        Map.Entry::getValue
-                ));
+		if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new InvalidAmountException("Amount must be positive");
+		}
+	}
 
-        if (extractedRates.isEmpty()) {
-            throw new ExternalProviderException("No valid exchange rates found for base currency " + baseCurrency);
-        }
-
-        return extractedRates;
-    }
-
-    private void validateAmount(BigDecimal amount) {
-        if (amount == null) {
-            throw new InvalidAmountException("Amount must not be null");
-        }
-
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new InvalidAmountException("Amount must not be negative");
-        }
-    }
-
-    private BigDecimal calculateConvertedAmount(BigDecimal amount, BigDecimal rate) {
-        return amount.multiply(rate).setScale(6, RoundingMode.HALF_UP);
-    }
+	private BigDecimal calculateConvertedAmount(BigDecimal amount, BigDecimal rate) {
+		return amount.multiply(rate).setScale(6, RoundingMode.HALF_UP);
+	}
 }

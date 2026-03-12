@@ -1,0 +1,52 @@
+package pt.rho.exchangerate.dto;
+
+import java.time.OffsetDateTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Standard API error response")
+public class ErrorResponse {
+
+	@Schema(description = "Timestamp of the error", example = "2026-03-11T15:10:00Z")
+	private OffsetDateTime timestamp;
+
+	@Schema(description = "HTTP status code", example = "400")
+	private int status;
+
+	@Schema(description = "HTTP error name", example = "Bad Request")
+	private String error;
+
+	@Schema(description = "Error message", example = "Currency must have exactly 3 characters")
+	private String message;
+
+	@Schema(description = "Request path", example = "/api/v1/exchange-rates/EU/USD")
+	private String path;
+
+	public ErrorResponse(OffsetDateTime timestamp, int status, String error, String message, String path) {
+		this.timestamp = timestamp;
+		this.status = status;
+		this.error = error;
+		this.message = message;
+		this.path = path;
+	}
+
+	public OffsetDateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public String getPath() {
+		return path;
+	}
+}

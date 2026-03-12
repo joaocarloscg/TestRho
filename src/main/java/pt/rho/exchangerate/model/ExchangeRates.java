@@ -5,27 +5,27 @@ import java.util.Map;
 
 public class ExchangeRates {
 
-    private String baseCurrency;
-    private Map<String, BigDecimal> rates;
+	private String baseCurrency;
+	private Map<String, BigDecimal> rates;
 
-    public ExchangeRates(String baseCurrency, Map<String, BigDecimal> rates) {
-        this.baseCurrency = baseCurrency;
-        this.rates = rates;
-    }
+	public ExchangeRates(String baseCurrency, Map<String, BigDecimal> rates) {
+		this.baseCurrency = baseCurrency;
+		this.rates = rates;
+	}
 
-    public String getBaseCurrency() {
-        return baseCurrency;
-    }
+	public String getBaseCurrency() {
+		return baseCurrency;
+	}
 
-    public void setBaseCurrency(String baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
+	public void setBaseCurrency(String baseCurrency) {
+		this.baseCurrency = baseCurrency;
+	}
 
-    public Map<String, BigDecimal> getRates() {
-        return rates;
-    }
+	public Map<String, BigDecimal> getRates() {
+		return rates;
+	}
 
-    public void setRates(Map<String, BigDecimal> rates) {
-        this.rates = rates;
-    }
+	public void setRates(Map<String, BigDecimal> rates) {
+		this.rates = rates;
+	}
 }
