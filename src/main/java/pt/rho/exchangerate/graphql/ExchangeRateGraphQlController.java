@@ -18,33 +18,33 @@ import pt.rho.exchangerate.service.ExchangeRateService;
 public class ExchangeRateGraphQlController {
 
     private final ExchangeRateService exchangeRateService;
-    private final ResponseMapper responseMapper;
+    private final GraphQLResponseMapper graphQLResponseMapper;
 
     public ExchangeRateGraphQlController(ExchangeRateService exchangeRateService,
-            ResponseMapper responseMapper) {
+            GraphQLResponseMapper graphQLResponseMapper) {
         this.exchangeRateService = exchangeRateService;
-        this.responseMapper = responseMapper;
+        this.graphQLResponseMapper = graphQLResponseMapper;
     }
 
     @QueryMapping
     public ExchangeRatesGraphQlResponse exchangeRates(@Argument String base, @Argument List<String> currencies) {
         ExchangeRates exchangeRates = exchangeRateService.getAllRates(base);
-        return responseMapper.toExchangeRatesGraphQlResponse(exchangeRates, currencies);
+        return graphQLResponseMapper.toExchangeRatesGraphQlResponse(exchangeRates, currencies);
     }
 
     @QueryMapping
     public ExchangeRateResponse exchangeRate(@Argument String from, @Argument String to) {
-        return responseMapper.toExchangeRateResponse(exchangeRateService.getExchangeRate(from, to));
+        return graphQLResponseMapper.toExchangeRateResponse(exchangeRateService.getExchangeRate(from, to));
     }
 
     @QueryMapping
     public ConversionResponse convert(@Argument String from, @Argument String to, @Argument BigDecimal amount) {
-        return responseMapper.toConversionResponse(exchangeRateService.convert(from, to, amount));
+        return graphQLResponseMapper.toConversionResponse(exchangeRateService.convert(from, to, amount));
     }
 
     @QueryMapping
     public MultiConversionResponse convertMultiple(@Argument String from, @Argument List<String> to,
             @Argument BigDecimal amount) {
-        return responseMapper.toMultiConversionResponse(exchangeRateService.convert(from, to, amount));
+        return graphQLResponseMapper.toMultiConversionResponse(exchangeRateService.convert(from, to, amount));
     }
 }

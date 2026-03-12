@@ -2,6 +2,8 @@ package pt.rho.exchangerate.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import graphql.GraphQLError;
+import graphql.schema.DataFetchingEnvironment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,25 +12,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.client.RestClientException;
 
-import graphql.GraphQLError;
-import graphql.schema.DataFetchingEnvironment;
 import pt.rho.exchangerate.exception.ApiException;
 import pt.rho.exchangerate.exception.InvalidCurrencyException;
 
 @ExtendWith(MockitoExtension.class)
-class ExceptionHandlerTests {
+class GraphQLErrorHandlerTests {
 
     @Mock
     private DataFetchingEnvironment environment;
 
-    private final ExceptionHandler exceptionHandler = new ExceptionHandler();
+    private final GraphQLErrorHandler graphQLErrorHandler = new GraphQLErrorHandler();
 
     @Test
     @DisplayName("Should map ApiException to GraphQLError with HTTP status classification")
     void shouldHandleApiException() {
         ApiException exception = new InvalidCurrencyException("Currency must have exactly 3 characters");
 
-        GraphQLError error = exceptionHandler.handleApiException(exception, environment);
+        GraphQLError error = graphQLErrorHandler.handleApiException(exception, environment);
 
         assertThat(error.getMessage()).isEqualTo("Currency must have exactly 3 characters");
         assertThat(error.getExtensions())
@@ -40,7 +40,7 @@ class ExceptionHandlerTests {
     void shouldHandleRestClientException() {
         RestClientException exception = new RestClientException("Provider unavailable");
 
-        GraphQLError error = exceptionHandler.handleRestClientException(exception, environment);
+        GraphQLError error = graphQLErrorHandler.handleRestClientException(exception, environment);
 
         assertThat(error.getMessage())
                 .isEqualTo("Failed to retrieve data from external exchange rate provider");
@@ -54,7 +54,7 @@ class ExceptionHandlerTests {
         MissingServletRequestParameterException exception =
                 new MissingServletRequestParameterException("amount", "BigDecimal");
 
-        GraphQLError error = exceptionHandler.handleMissingParameter(exception, environment);
+        GraphQLError error = graphQLErrorHandler.handleMissingParameter(exception, environment);
 
         assertThat(error.getMessage())
                 .isEqualTo("Required request parameter 'amount' is missing");
@@ -67,7 +67,7 @@ class ExceptionHandlerTests {
     void shouldHandleGenericException() {
         Exception exception = new RuntimeException("Unexpected");
 
-        GraphQLError error = exceptionHandler.handleGenericException(exception, environment);
+        GraphQLError error = graphQLErrorHandler.handleGenericException(exception, environment);
 
         assertThat(error.getMessage()).isEqualTo("An unexpected error occurred");
         assertThat(error.getExtensions())

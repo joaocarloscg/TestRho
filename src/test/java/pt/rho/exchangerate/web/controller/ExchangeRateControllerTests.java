@@ -13,6 +13,7 @@ import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.service.ExchangeRateService;
+import pt.rho.exchangerate.web.ErrorResponseFactory;
 import pt.rho.exchangerate.web.GlobalExceptionHandler;
 import pt.rho.exchangerate.web.RateLimitingFilter;
 
@@ -45,7 +46,7 @@ import org.springframework.context.annotation.Import;
                 classes = RateLimitingFilter.class
         )
 )
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, ErrorResponseFactory.class})
 class ExchangeRateControllerTests {
 
     @Autowired

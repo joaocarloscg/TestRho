@@ -15,7 +15,7 @@ import pt.rho.exchangerate.graphql.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.model.ExchangeRates;
 
 @Component
-public class ResponseMapper {
+public class GraphQLResponseMapper {
 
     public ExchangeRatesGraphQlResponse toExchangeRatesGraphQlResponse(ExchangeRates exchangeRates,
             List<String> currenciesFilter) {

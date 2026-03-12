@@ -5,10 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import pt.rho.exchangerate.config.ApplicationProperties;
+import pt.rho.exchangerate.config.AuthProperties;
 import pt.rho.exchangerate.config.RateLimitProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ ApplicationProperties.class, RateLimitProperties.class })
+@EnableConfigurationProperties({ ApplicationProperties.class, RateLimitProperties.class, AuthProperties.class })
 public class Application {
 
 	public static void main(String[] args) {

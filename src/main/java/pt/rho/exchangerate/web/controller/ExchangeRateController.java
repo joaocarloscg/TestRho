@@ -45,9 +45,7 @@ public class ExchangeRateController {
 	@Operation(summary = "Get all exchange rates from a base currency", description = "Returns all available exchange rates using the supplied base currency")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Exchange rates retrieved successfully", content = @Content(schema = @Schema(implementation = ExchangeRatesResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Invalid base currency", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Unexpected internal error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "502", description = "External provider error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+			@ApiResponse(responseCode = "*", description = "Error occurred", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@GetMapping("/{base}")
 	public ExchangeRatesResponse getAllRates(
 			@Parameter(description = "Base currency code, e.g. USD or EUR") @PathVariable String base) {
@@ -59,10 +57,7 @@ public class ExchangeRateController {
 	@Operation(summary = "Get exchange rate from one currency to another", description = "Returns the exchange rate between two supplied currencies")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Exchange rate retrieved successfully", content = @Content(schema = @Schema(implementation = ExchangeRateResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Invalid currency supplied", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "404", description = "Exchange rate not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Unexpected internal error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "502", description = "External provider error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+			@ApiResponse(responseCode = "*", description = "Error occurred", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@GetMapping("/{from}/{to}")
 	public ExchangeRateResponse getExchangeRate(
 			@Parameter(description = "Source currency code, e.g. USD") @PathVariable String from,
@@ -76,10 +71,7 @@ public class ExchangeRateController {
 	@Operation(summary = "Convert an amount from one currency to another", description = "Returns the exchange rate and the converted amount for a single target currency")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Conversion performed successfully", content = @Content(schema = @Schema(implementation = ConversionResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Invalid currency or amount", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "404", description = "Exchange rate not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Unexpected internal error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "502", description = "External provider error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+			@ApiResponse(responseCode = "*", description = "Error occurred", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@GetMapping("/convert/{from}/{to}")
 	public ConversionResponse convert(
 			@Parameter(description = "Source currency code, e.g. USD") @PathVariable String from,
@@ -94,10 +86,7 @@ public class ExchangeRateController {
 	@Operation(summary = "Convert an amount from one currency to multiple currencies", description = "Returns conversion results for a list of supplied target currencies")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Multiple conversions performed successfully", content = @Content(schema = @Schema(implementation = MultiConversionResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Invalid source currency, target currencies or amount", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "404", description = "One or more exchange rates not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Unexpected internal error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-			@ApiResponse(responseCode = "502", description = "External provider error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+			@ApiResponse(responseCode = "*", description = "Error occurred", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@GetMapping("/convert/{from}")
 	public MultiConversionResponse convertMultiple(
 			@Parameter(description = "Source currency code, e.g. USD") @PathVariable String from,

@@ -12,6 +12,8 @@ Spring Boot API for retrieving exchange rates and performing currency conversion
 - In-memory caching with 1-minute TTL
 - Unit and integration tests
 - Dockerized setup
+- GraphQL
+- API key authentication and authorization
 
 ## Tech Stack
 
@@ -32,6 +34,12 @@ This application requires an API key for the external exchange rate provider.
 Set the following environment variable before starting the application:
 
 - `EXCHANGE_RATE_PROVIDER_ACCESS_KEY`
+- `AUTH_DEFAULT_API_KEY`
+
+Optional authentication settings:
+
+- `AUTH_ENABLED` (defaults to `true`)
+- `AUTH_HEADER_NAME` (defaults to `X-API-Key`)
 
 # Running the application
 
@@ -40,6 +48,8 @@ Set the following environment variable before starting the application:
 After setting the required environment variable:
 
 ```bash
+AUTH_DEFAULT_API_KEY=replace-with-a-long-random-secret \
+EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_api_key_here \
 ./mvnw spring-boot:run
 ```
 
@@ -58,6 +68,7 @@ docker build -t exchange-rate-api .
 ```bash
 docker run -p 8080:8080 \
   -e EXCHANGE_RATE_PROVIDER_ACCESS_KEY=your_api_key_here \
+  -e AUTH_DEFAULT_API_KEY=replace-with-a-long-random-secret \
   exchange-rate-api
 ```
 
@@ -67,7 +78,7 @@ Application will be available at:
 
 ## Run with Docker Compose
 
-Make sure `EXCHANGE_RATE_PROVIDER_ACCESS_KEY` is set in your environment or in a local `.env` file before running:
+Make sure `EXCHANGE_RATE_PROVIDER_ACCESS_KEY` and `AUTH_DEFAULT_API_KEY` are set in your environment or in a local `.env` file before running:
 
 ```bash
 docker compose up --build
@@ -109,6 +120,41 @@ query {
   }
 }
 ```
+
+# Authentication and Authorization
+
+Protected REST and GraphQL endpoints now require an API key sent in the `X-API-Key` header.
+
+Default authorization model:
+
+- `SCOPE_rates.read` for REST endpoints under `/api/v1/exchange-rates/**`
+- `SCOPE_graphql.read` for `/graphql`
+
+Public endpoints:
+
+- `/actuator/health`
+- `/actuator/info`
+- `/swagger-ui/**`
+- `/v3/api-docs/**`
+- `/graphiql`
+
+Example REST request:
+
+```bash
+curl -H "X-API-Key: $AUTH_DEFAULT_API_KEY" \
+  http://localhost:8080/api/v1/exchange-rates/USD/EUR
+```
+
+Example GraphQL request:
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $AUTH_DEFAULT_API_KEY" \
+  -d '{"query":"{ exchangeRate(from: \"USD\", to: \"EUR\") { from to rate } }"}'
+```
+
+If you need more than one client, define additional `auth.clients[n]` entries with their own API keys and authorities.
 
 # Swagger UI
 

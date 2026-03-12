@@ -34,13 +34,13 @@ class ExchangeRateGraphQlControllerTests {
     private ExchangeRateService exchangeRateService;
 
     @Mock
-    private ResponseMapper responseMapper;
+    private GraphQLResponseMapper graphQLResponseMapper;
 
     private ExchangeRateGraphQlController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new ExchangeRateGraphQlController(exchangeRateService, responseMapper);
+        controller = new ExchangeRateGraphQlController(exchangeRateService, graphQLResponseMapper);
     }
 
     @Test
@@ -63,14 +63,14 @@ class ExchangeRateGraphQlControllerTests {
         );
 
         when(exchangeRateService.getAllRates("USD")).thenReturn(exchangeRates);
-        when(responseMapper.toExchangeRatesGraphQlResponse(exchangeRates, List.of("EUR", "GBP")))
+        when(graphQLResponseMapper.toExchangeRatesGraphQlResponse(exchangeRates, List.of("EUR", "GBP")))
                 .thenReturn(mappedResponse);
 
         ExchangeRatesGraphQlResponse result = controller.exchangeRates("USD", List.of("EUR", "GBP"));
 
         assertThat(result).isSameAs(mappedResponse);
         verify(exchangeRateService).getAllRates("USD");
-        verify(responseMapper).toExchangeRatesGraphQlResponse(exchangeRates, List.of("EUR", "GBP"));
+        verify(graphQLResponseMapper).toExchangeRatesGraphQlResponse(exchangeRates, List.of("EUR", "GBP"));
     }
 
     @Test
@@ -89,13 +89,13 @@ class ExchangeRateGraphQlControllerTests {
         );
 
         when(exchangeRateService.getExchangeRate("USD", "EUR")).thenReturn(exchangeRateResult);
-        when(responseMapper.toExchangeRateResponse(exchangeRateResult)).thenReturn(mappedResponse);
+        when(graphQLResponseMapper.toExchangeRateResponse(exchangeRateResult)).thenReturn(mappedResponse);
 
         ExchangeRateResponse result = controller.exchangeRate("USD", "EUR");
 
         assertThat(result).isSameAs(mappedResponse);
         verify(exchangeRateService).getExchangeRate("USD", "EUR");
-        verify(responseMapper).toExchangeRateResponse(exchangeRateResult);
+        verify(graphQLResponseMapper).toExchangeRateResponse(exchangeRateResult);
     }
 
     @Test
@@ -118,13 +118,13 @@ class ExchangeRateGraphQlControllerTests {
         );
 
         when(exchangeRateService.convert("USD", "EUR", new BigDecimal("100"))).thenReturn(conversionResult);
-        when(responseMapper.toConversionResponse(conversionResult)).thenReturn(mappedResponse);
+        when(graphQLResponseMapper.toConversionResponse(conversionResult)).thenReturn(mappedResponse);
 
         ConversionResponse result = controller.convert("USD", "EUR", new BigDecimal("100"));
 
         assertThat(result).isSameAs(mappedResponse);
         verify(exchangeRateService).convert("USD", "EUR", new BigDecimal("100"));
-        verify(responseMapper).toConversionResponse(conversionResult);
+        verify(graphQLResponseMapper).toConversionResponse(conversionResult);
     }
 
     @Test
@@ -173,7 +173,7 @@ class ExchangeRateGraphQlControllerTests {
                 List.of("EUR", "GBP"),
                 new BigDecimal("100")
         )).thenReturn(multiConversionResult);
-        when(responseMapper.toMultiConversionResponse(multiConversionResult)).thenReturn(mappedResponse);
+        when(graphQLResponseMapper.toMultiConversionResponse(multiConversionResult)).thenReturn(mappedResponse);
 
         MultiConversionResponse result = controller.convertMultiple(
                 "USD",
@@ -183,6 +183,6 @@ class ExchangeRateGraphQlControllerTests {
 
         assertThat(result).isSameAs(mappedResponse);
         verify(exchangeRateService).convert("USD", List.of("EUR", "GBP"), new BigDecimal("100"));
-        verify(responseMapper).toMultiConversionResponse(multiConversionResult);
+        verify(graphQLResponseMapper).toMultiConversionResponse(multiConversionResult);
     }
 }

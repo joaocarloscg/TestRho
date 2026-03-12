@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest(properties = {
+        "auth.enabled=false",
         "rate-limit.enabled=true",
         "rate-limit.capacity=2",
         "rate-limit.refill-tokens=2",

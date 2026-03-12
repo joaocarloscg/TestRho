@@ -18,9 +18,9 @@ import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 
-class ResponseMapperTests {
+class GraphQLResponseMapperTests {
 
-    private final ResponseMapper mapper = new ResponseMapper();
+    private final GraphQLResponseMapper mapper = new GraphQLResponseMapper();
 
     @Test
     @DisplayName("toExchangeRatesGraphQlResponse should sort currencies and apply optional filters")

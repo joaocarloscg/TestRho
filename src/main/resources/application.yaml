@@ -30,6 +30,16 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+auth:
+  enabled: ${AUTH_ENABLED:true}
+  header-name: ${AUTH_HEADER_NAME:X-API-Key}
+  clients:
+    - name: default-client
+      key: ${AUTH_DEFAULT_API_KEY:}
+      authorities:
+        - SCOPE_rates.read
+        - SCOPE_graphql.read
+
 exchange-rate:
   provider:
     base-url: https://api.exchangerate.host
