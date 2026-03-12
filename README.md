@@ -73,6 +73,43 @@ Make sure `EXCHANGE_RATE_PROVIDER_ACCESS_KEY` is set in your environment or in a
 docker compose up --build
 ```
 
+# GraphQL
+
+GraphQL is available alongside the existing REST API at:
+
+`http://localhost:8080/graphql`
+
+GraphiQL is enabled for local exploration at:
+
+`http://localhost:8080/graphiql`
+
+Example query:
+
+```graphql
+query {
+  exchangeRates(base: "USD", currencies: ["EUR", "JPY"]) {
+    base
+    rates {
+      currency
+      rate
+    }
+  }
+}
+```
+
+Example conversion query:
+
+```graphql
+query {
+  convert(from: "USD", to: "EUR", amount: 100) {
+    from
+    to
+    rate
+    convertedAmount
+  }
+}
+```
+
 # Swagger UI
 
 API documentation is available at:

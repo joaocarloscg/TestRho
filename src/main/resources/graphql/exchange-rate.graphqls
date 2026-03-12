@@ -1,0 +1,44 @@
+type Query {
+  exchangeRates(base: String!, currencies: [String!]): ExchangeRates!
+  exchangeRate(from: String!, to: String!): ExchangeRate!
+  convert(from: String!, to: String!, amount: BigDecimal!): Conversion!
+  convertMultiple(from: String!, to: [String!]!, amount: BigDecimal!): MultiConversion!
+}
+
+type ExchangeRates {
+  base: String!
+  rates: [CurrencyRate!]!
+}
+
+type CurrencyRate {
+  currency: String!
+  rate: BigDecimal!
+}
+
+type ExchangeRate {
+  from: String!
+  to: String!
+  rate: BigDecimal!
+}
+
+type Conversion {
+  from: String!
+  to: String!
+  originalAmount: BigDecimal!
+  rate: BigDecimal!
+  convertedAmount: BigDecimal!
+}
+
+type MultiConversion {
+  from: String!
+  originalAmount: BigDecimal!
+  conversions: [SingleConversionItem!]!
+}
+
+type SingleConversionItem {
+  currency: String!
+  rate: BigDecimal!
+  convertedAmount: BigDecimal!
+}
+
+scalar BigDecimal

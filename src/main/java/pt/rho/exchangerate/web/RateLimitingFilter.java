@@ -63,6 +63,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
-		return !request.getRequestURI().startsWith("/api/");
+		String requestUri = request.getRequestURI();
+		return !(requestUri.startsWith("/api/") || requestUri.startsWith("/graphql"));
 	}
 }

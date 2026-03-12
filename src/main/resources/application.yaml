@@ -1,6 +1,9 @@
 spring:
   application:
     name: exchange-rate-api
+  graphql:
+    graphiql:
+      enabled: true
   cache:
     type: caffeine
     cache-names: exchangeRates
