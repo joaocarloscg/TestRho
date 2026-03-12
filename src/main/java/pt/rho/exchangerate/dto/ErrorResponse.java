@@ -19,7 +19,7 @@ public class ErrorResponse {
 	@Schema(description = "Error message", example = "Currency must have exactly 3 characters")
 	private String message;
 
-	@Schema(description = "Request path", example = "/api/v1/exchange-rates/EU/USD")
+	@Schema(description = "Request path", example = "/api/v1/rates/EU/USD")
 	private String path;
 
 	public ErrorResponse(OffsetDateTime timestamp, int status, String error, String message, String path) {

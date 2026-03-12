@@ -44,7 +44,7 @@ public class GraphQLErrorHandler {
     }
 
     private GraphQLError graphQlError(String errorType, String message, DataFetchingEnvironment environment) {
-        GraphqlErrorBuilder builder = GraphqlErrorBuilder.newError()
+        GraphqlErrorBuilder<?> builder = GraphqlErrorBuilder.newError()
                 .message(message)
                 .extensions(Map.of("classification", errorType));
 

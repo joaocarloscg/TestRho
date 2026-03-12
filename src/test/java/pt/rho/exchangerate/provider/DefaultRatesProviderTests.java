@@ -2,9 +2,12 @@ package pt.rho.exchangerate.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.net.URI;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.RequestHeadersSpec;
 import org.springframework.web.client.RestClient.RequestHeadersUriSpec;
+import org.springframework.web.util.UriBuilder;
 
 import pt.rho.exchangerate.config.ApplicationProperties;
 import pt.rho.exchangerate.exception.ExternalProviderException;
@@ -21,18 +26,17 @@ import pt.rho.exchangerate.exception.InvalidCurrencyException;
 import pt.rho.exchangerate.provider.dto.RatesProviderResponse;
 import pt.rho.exchangerate.validation.CurrencyValidator;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 @ExtendWith(MockitoExtension.class)
 class DefaultRatesProviderTests {
 
     @Mock
     private RestClient restClient;
 
-	@Mock
-    private RequestHeadersUriSpec requestHeadersUriSpec;
+    @Mock
+    private RequestHeadersUriSpec<?> requestHeadersUriSpec;
 
     @Mock
-    private RestClient.RequestHeadersSpec<?> requestHeadersSpec;
+    private RequestHeadersSpec<?> requestHeadersSpec;
 
     @Mock
     private RestClient.ResponseSpec responseSpec;
@@ -54,14 +58,14 @@ class DefaultRatesProviderTests {
         );
     }
 
-	@Test
+    @Test
     @DisplayName("Should return rates provider response when external call succeeds")
     void shouldReturnRatesProviderResponseWhenExternalCallSucceeds() {
         RatesProviderResponse response = new RatesProviderResponse();
 
         when(currencyValidator.validateAndNormalize(" usd ")).thenReturn("USD");
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
+        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(org.mockito.ArgumentMatchers.<Function<UriBuilder, URI>>any());
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(RatesProviderResponse.class)).thenReturn(response);
 
@@ -70,7 +74,7 @@ class DefaultRatesProviderTests {
         assertThat(result).isSameAs(response);
         verify(currencyValidator).validateAndNormalize(" usd ");
         verify(restClient).get();
-        verify(requestHeadersUriSpec).uri(any(java.util.function.Function.class));
+        verify(requestHeadersUriSpec).uri(org.mockito.ArgumentMatchers.<Function<UriBuilder, URI>>any());
         verify(requestHeadersSpec).retrieve();
         verify(responseSpec).body(RatesProviderResponse.class);
     }
@@ -81,8 +85,8 @@ class DefaultRatesProviderTests {
         RatesProviderResponse response = new RatesProviderResponse();
 
         when(currencyValidator.validateAndNormalize("eur")).thenReturn("EUR");
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
+        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(org.mockito.ArgumentMatchers.<Function<UriBuilder, URI>>any());
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(RatesProviderResponse.class)).thenReturn(response);
 
@@ -92,12 +96,12 @@ class DefaultRatesProviderTests {
         verify(currencyValidator).validateAndNormalize("eur");
     }
 
-	@Test
+    @Test
     @DisplayName("Should throw ExternalProviderException when external provider returns null response")
     void shouldThrowWhenExternalProviderReturnsNullResponse() {
         when(currencyValidator.validateAndNormalize("USD")).thenReturn("USD");
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
+        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(org.mockito.ArgumentMatchers.<Function<UriBuilder, URI>>any());
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(RatesProviderResponse.class)).thenReturn(null);
 

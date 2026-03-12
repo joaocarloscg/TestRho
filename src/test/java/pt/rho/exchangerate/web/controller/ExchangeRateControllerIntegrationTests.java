@@ -22,9 +22,9 @@ class ExchangeRateControllerIntegrationTests {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from}/{to} should return 400 when amount is invalid")
+    @DisplayName("GET /api/v1/conversions/{from}/{to} should return 400 when amount is invalid")
     void shouldReturnBadRequestWhenSingleConvertAmountIsInvalidType() throws Exception {
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD/EUR")
+        mockMvc.perform(get("/api/v1/conversions/USD/EUR")
                         .param("amount", "abc"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
@@ -32,18 +32,18 @@ class ExchangeRateControllerIntegrationTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from}/{to} should return 400 when amount is missing")
+    @DisplayName("GET /api/v1/conversions/{from}/{to} should return 400 when amount is missing")
     void shouldReturnBadRequestWhenSingleConvertAmountMissing() throws Exception {
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD/EUR"))
+        mockMvc.perform(get("/api/v1/conversions/USD/EUR"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
                         .value("Required request parameter 'amount' is missing"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from} should return 400 when amount is invalid")
+    @DisplayName("GET /api/v1/conversions/{from} should return 400 when amount is invalid")
     void shouldReturnBadRequestWhenMultiConvertAmountIsInvalidType() throws Exception {
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD")
+        mockMvc.perform(get("/api/v1/conversions/USD")
                         .param("amount", "abc")
                         .param("to", "EUR", "GBP"))
                 .andExpect(status().isBadRequest())
@@ -52,9 +52,9 @@ class ExchangeRateControllerIntegrationTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from} should return 400 when amount is missing")
+    @DisplayName("GET /api/v1/conversions/{from} should return 400 when amount is missing")
     void shouldReturnBadRequestWhenMultiConvertAmountMissing() throws Exception {
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD")
+        mockMvc.perform(get("/api/v1/conversions/USD")
                         .param("to", "EUR", "GBP"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
@@ -62,9 +62,9 @@ class ExchangeRateControllerIntegrationTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from} should return 400 when target currencies are missing")
+    @DisplayName("GET /api/v1/conversions/{from} should return 400 when target currencies are missing")
     void shouldReturnBadRequestWhenMultiConvertTargetsMissing() throws Exception {
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD")
+        mockMvc.perform(get("/api/v1/conversions/USD")
                         .param("amount", "100"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")

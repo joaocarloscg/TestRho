@@ -59,7 +59,7 @@ class ExchangeRateControllerTests {
     private ApiResponseMapper apiResponseMapper;
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{base} should return all rates for base currency")
+    @DisplayName("GET /api/v1/rates/{base} should return all rates for base currency")
     void shouldReturnAllRates() throws Exception {
         ExchangeRates serviceResult = new ExchangeRates(
                 "USD",
@@ -80,7 +80,7 @@ class ExchangeRateControllerTests {
         when(exchangeRateService.getAllRates("USD")).thenReturn(serviceResult);
         when(apiResponseMapper.toExchangeRatesResponse(serviceResult)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD"))
+        mockMvc.perform(get("/api/v1/rates?base=USD"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.base").value("USD"))
                 .andExpect(jsonPath("$.rates.EUR").value(0.92))
@@ -91,7 +91,7 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{from}/{to} should return exchange rate")
+    @DisplayName("GET /api/v1/rates/{from}/{to} should return exchange rate")
     void shouldReturnExchangeRate() throws Exception {
         ExchangeRateResult serviceResult =
                 new ExchangeRateResult("USD", "EUR", new BigDecimal("0.92"));
@@ -102,7 +102,7 @@ class ExchangeRateControllerTests {
         when(exchangeRateService.getExchangeRate("USD", "EUR")).thenReturn(serviceResult);
         when(apiResponseMapper.toExchangeRateResponse(serviceResult)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD/EUR"))
+        mockMvc.perform(get("/api/v1/rates/USD/EUR"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.from").value("USD"))
                 .andExpect(jsonPath("$.to").value("EUR"))
@@ -113,29 +113,29 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{from}/{to} should return 404 when rate not found")
+    @DisplayName("GET /api/v1/rates/{from}/{to} should return 404 when rate not found")
     void shouldReturnNotFoundWhenRateMissing() throws Exception {
         when(exchangeRateService.getExchangeRate("USD", "EUR"))
                 .thenThrow(new ExchangeRateNotFoundException("Exchange rate not found from USD to EUR"));
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD/EUR"))
+        mockMvc.perform(get("/api/v1/rates/USD/EUR"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Exchange rate not found from USD to EUR"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{from}/{to} should return 400 for invalid currency")
+    @DisplayName("GET /api/v1/rates/{from}/{to} should return 400 for invalid currency")
     void shouldReturnBadRequestForInvalidCurrency() throws Exception {
         when(exchangeRateService.getExchangeRate("US", "EUR"))
                 .thenThrow(new InvalidCurrencyException("Currency must have exactly 3 characters"));
 
-        mockMvc.perform(get("/api/v1/exchange-rates/US/EUR"))
+        mockMvc.perform(get("/api/v1/rates/US/EUR"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Currency must have exactly 3 characters"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from}/{to} should convert amount")
+    @DisplayName("GET /api/v1/conversions/{from}/{to} should convert amount")
     void shouldConvertAmount() throws Exception {
         ConversionResult serviceResult = new ConversionResult(
                 "USD",
@@ -158,7 +158,7 @@ class ExchangeRateControllerTests {
         when(apiResponseMapper.toConversionResponse(serviceResult))
                 .thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD/EUR")
+        mockMvc.perform(get("/api/v1/conversions/USD/EUR")
                         .param("amount", "100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.from").value("USD"))
@@ -172,7 +172,7 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/convert/{from} should convert to multiple currencies")
+    @DisplayName("GET /api/v1/conversions/{from} should convert to multiple currencies")
     void shouldConvertMultipleCurrencies() throws Exception {
         MultiConversionResult serviceResult = new MultiConversionResult(
                 "USD",
@@ -199,7 +199,7 @@ class ExchangeRateControllerTests {
 
         when(apiResponseMapper.toMultiConversionResponse(serviceResult)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/exchange-rates/convert/USD")
+        mockMvc.perform(get("/api/v1/conversions/USD")
                         .param("amount", "100")
                         .param("to", "EUR", "GBP"))
                 .andExpect(status().isOk())
@@ -218,27 +218,27 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{base} should return 502 when external provider fails")
+    @DisplayName("GET /api/v1/rates/{base} should return 502 when external provider fails")
     void shouldReturnBadGatewayWhenExternalProviderFails() throws Exception {
         when(exchangeRateService.getAllRates("USD"))
                 .thenThrow(new RestClientException("Provider unavailable"));
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD"))
+        mockMvc.perform(get("/api/v1/rates?base=USD"))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.status").value(502))
                 .andExpect(jsonPath("$.error").value("Bad Gateway"))
                 .andExpect(jsonPath("$.message")
                         .value("Failed to retrieve data from external exchange rate provider"))
-                .andExpect(jsonPath("$.path").value("/api/v1/exchange-rates/USD"));
+                .andExpect(jsonPath("$.path").value("/api/v1/rates"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/exchange-rates/{from}/{to} should return 500 for unexpected exception")
+    @DisplayName("GET /api/v1/rates/{from}/{to} should return 500 for unexpected exception")
     void shouldReturnInternalServerErrorForUnexpectedException() throws Exception {
         when(exchangeRateService.getExchangeRate("USD", "EUR"))
                 .thenThrow(new RuntimeException("Unexpected"));
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD/EUR"))
+        mockMvc.perform(get("/api/v1/rates/USD/EUR"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
     }

@@ -39,20 +39,20 @@ class RateLimitServiceIntegrationTests {
         when(exchangeRateService.getAllRates("USD"))
                 .thenReturn(new ExchangeRates("USD", Map.of("EUR", BigDecimal.valueOf(0.92))));
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD")
+        mockMvc.perform(get("/api/v1/rates?base=USD")
                         .header("X-Forwarded-For", "1.2.3.4"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD")
+        mockMvc.perform(get("/api/v1/rates?base=USD")
                         .header("X-Forwarded-For", "1.2.3.4"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/exchange-rates/USD")
+        mockMvc.perform(get("/api/v1/rates?base=USD")
                         .header("X-Forwarded-For", "1.2.3.4"))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.status").value(429))
                 .andExpect(jsonPath("$.error").value("Too Many Requests"))
                 .andExpect(jsonPath("$.message").value("Rate limit exceeded. Please try again later."))
-                .andExpect(jsonPath("$.path").value("/api/v1/exchange-rates/USD"));
+                .andExpect(jsonPath("$.path").value("/api/v1/rates"));
     }
 }

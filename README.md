@@ -9,7 +9,7 @@ Spring Boot API for retrieving exchange rates and performing currency conversion
 - Convert an amount from one currency to another
 - Convert an amount from one currency to multiple currencies
 - OpenAPI / Swagger documentation
-- In-memory caching with 1-minute TTL
+- In-memory caching with 1-minute TTL configured in the application.yaml
 - Unit and integration tests
 - Dockerized setup
 - GraphQL
@@ -127,7 +127,7 @@ Protected REST and GraphQL endpoints now require an API key sent in the `X-API-K
 
 Default authorization model:
 
-- `SCOPE_rates.read` for REST endpoints under `/api/v1/exchange-rates/**`
+- `SCOPE_rates.read` for REST endpoints under `/api/v1/rates/**`
 - `SCOPE_graphql.read` for `/graphql`
 
 Public endpoints:
@@ -142,7 +142,7 @@ Example REST request:
 
 ```bash
 curl -H "X-API-Key: $AUTH_DEFAULT_API_KEY" \
-  http://localhost:8080/api/v1/exchange-rates/USD/EUR
+  http://localhost:8080/api/v1/rates/USD/EUR
 ```
 
 Example GraphQL request:
@@ -166,7 +166,7 @@ API documentation is available at:
 
 ## Get all exchange rates from USD
 
-`GET /api/v1/exchange-rates/USD`
+`GET /api/v1/rates/USD`
 
 Example response:
 
@@ -183,7 +183,7 @@ Example response:
 
 ## Get exchange rate from USD to EUR
 
-`GET /api/v1/exchange-rates/USD/EUR`
+`GET /api/v1/rates/USD/EUR`
 
 Example response:
 
@@ -197,7 +197,7 @@ Example response:
 
 ## Convert 100 USD to EUR
 
-`GET /api/v1/exchange-rates/convert/USD/EUR?amount=100`
+`GET /api/v1/conversions/USD/EUR?amount=100`
 
 Example response:
 
@@ -213,7 +213,7 @@ Example response:
 
 ## Convert 100 USD to multiple currencies
 
-`GET /api/v1/exchange-rates/convert/USD?amount=100&to=EUR&to=GBP&to=JPY`
+`GET /api/v1/conversions/USD?amount=100&to=EUR&to=GBP&to=JPY`
 
 Example response:
 
