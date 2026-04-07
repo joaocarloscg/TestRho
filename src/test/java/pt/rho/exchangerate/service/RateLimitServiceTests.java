@@ -29,6 +29,7 @@ class RateLimitServiceTests {
         when(rateLimitProperties.getBucketCacheExpireAfterAccessMinutes()).thenReturn(60L);
 
         rateLimitService = new RateLimitService(rateLimitProperties);
+        rateLimitService.init();
     }
 
     @Test
