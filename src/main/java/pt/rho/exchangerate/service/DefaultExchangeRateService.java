@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.exception.ExchangeRateNotFoundException;
 import pt.rho.exchangerate.exception.InvalidAmountException;
 import pt.rho.exchangerate.exception.InvalidRequestException;
@@ -16,16 +17,11 @@ import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.validation.CurrencyValidator;
 
 @Service
+@RequiredArgsConstructor
 public class DefaultExchangeRateService implements ExchangeRateService {
 
 	private final CachedProviderService cachedProviderService;
 	private final CurrencyValidator currencyValidator;
-
-	public DefaultExchangeRateService(CachedProviderService cachedProviderService,
-			CurrencyValidator currencyValidator) {
-		this.cachedProviderService = cachedProviderService;
-		this.currencyValidator = currencyValidator;
-	}
 
 	@Override
 	public ExchangeRates getAllRates(String baseCurrency) {

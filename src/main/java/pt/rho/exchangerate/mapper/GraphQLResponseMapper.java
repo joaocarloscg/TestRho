@@ -1,4 +1,4 @@
-package pt.rho.exchangerate.graphql;
+package pt.rho.exchangerate.mapper;
 
 import java.util.Comparator;
 import java.util.List;
@@ -7,14 +7,16 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.dto.ConversionResponse;
+import pt.rho.exchangerate.dto.CurrencyRateGraphQlResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
+import pt.rho.exchangerate.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.dto.MultiConversionResponse;
-import pt.rho.exchangerate.graphql.dto.CurrencyRateGraphQlResponse;
-import pt.rho.exchangerate.graphql.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.model.ExchangeRates;
 
 @Component
+@RequiredArgsConstructor
 public class GraphQLResponseMapper {
 
     public ExchangeRatesGraphQlResponse toExchangeRatesGraphQlResponse(ExchangeRates exchangeRates,

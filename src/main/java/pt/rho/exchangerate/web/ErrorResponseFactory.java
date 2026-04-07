@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.dto.ErrorResponse;
 
 @Component
+@RequiredArgsConstructor
 public class ErrorResponseFactory {
 
     public ErrorResponse create(HttpStatus status, String message, String path) {

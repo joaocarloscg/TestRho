@@ -3,8 +3,10 @@ package pt.rho.exchangerate.dto;
 import java.time.OffsetDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Value;
 
 @Schema(description = "Standard API error response")
+@Value
 public class ErrorResponse {
 
 	@Schema(description = "Timestamp of the error", example = "2026-03-11T15:10:00Z")
@@ -22,31 +24,4 @@ public class ErrorResponse {
 	@Schema(description = "Request path", example = "/api/v1/rates/EU/USD")
 	private String path;
 
-	public ErrorResponse(OffsetDateTime timestamp, int status, String error, String message, String path) {
-		this.timestamp = timestamp;
-		this.status = status;
-		this.error = error;
-		this.message = message;
-		this.path = path;
-	}
-
-	public OffsetDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public String getError() {
-		return error;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public String getPath() {
-		return path;
-	}
 }

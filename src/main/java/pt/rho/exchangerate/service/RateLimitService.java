@@ -9,23 +9,25 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.config.RateLimitProperties;
 
 @Service
+@RequiredArgsConstructor
 public class RateLimitService {
 
 	private final RateLimitProperties rateLimitProperties;
-	private final Cache<String, Bucket> buckets;
+	private Cache<String, Bucket> buckets;
 
-	public RateLimitService(RateLimitProperties rateLimitProperties) {
-		this.rateLimitProperties = rateLimitProperties;
-
-		this.buckets = Caffeine.newBuilder()
-				.maximumSize(rateLimitProperties.getBucketCacheMaxSize())
-				.expireAfterAccess(Duration.ofMinutes(rateLimitProperties.getBucketCacheExpireAfterAccessMinutes()))
-				.build();
-	}
-
+    @PostConstruct
+    void init() {
+        this.buckets = Caffeine.newBuilder()
+                .maximumSize(rateLimitProperties.getBucketCacheMaxSize())
+                .expireAfterAccess(Duration.ofMinutes(rateLimitProperties.getBucketCacheExpireAfterAccessMinutes()))
+                .build();
+    }
+    
 	public boolean tryConsume(String clientKey) {
 		Bucket bucket = buckets.get(clientKey, key -> newBucket());
 		return bucket.tryConsume(1);

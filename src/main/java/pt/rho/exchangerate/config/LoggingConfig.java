@@ -1,15 +1,14 @@
 package pt.rho.exchangerate.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class LoggingConfig {
-	private static final Logger log = LoggerFactory.getLogger(LoggingConfig.class);
+import lombok.extern.slf4j.Slf4j;
 
+@Configuration
+@Slf4j
+public class LoggingConfig {
 	@Bean
 	ApplicationRunner applicationLoggingConfig(ApplicationProperties applicationProperties) {
 		return args -> {

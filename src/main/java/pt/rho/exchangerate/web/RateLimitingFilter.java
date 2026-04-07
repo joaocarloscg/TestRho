@@ -10,25 +10,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.config.RateLimitProperties;
 import pt.rho.exchangerate.exception.RateLimitExceededException;
 import pt.rho.exchangerate.service.RateLimitService;
 
 @Component
+@RequiredArgsConstructor
 public class RateLimitingFilter extends OncePerRequestFilter {
 
 	private final RateLimitService rateLimitService;
 	private final RateLimitProperties rateLimitProperties;
 	private final HandlerExceptionResolver handlerExceptionResolver;
-
-	public RateLimitingFilter(
-			RateLimitService rateLimitService, 
-			RateLimitProperties rateLimitProperties,
-			HandlerExceptionResolver handlerExceptionResolver) {
-		this.rateLimitService = rateLimitService;
-		this.rateLimitProperties = rateLimitProperties;
-		this.handlerExceptionResolver = handlerExceptionResolver;
-	}
 
 	@Override
 	protected void doFilterInternal(

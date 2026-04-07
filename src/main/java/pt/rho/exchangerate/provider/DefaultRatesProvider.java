@@ -3,26 +3,19 @@ package pt.rho.exchangerate.provider;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.config.ApplicationProperties;
 import pt.rho.exchangerate.provider.dto.RatesProviderResponse;
 import pt.rho.exchangerate.exception.ExternalProviderException;
 import pt.rho.exchangerate.validation.CurrencyValidator;
 
 @Component
+@RequiredArgsConstructor
 public class DefaultRatesProvider implements RatesProvider {
 
 	private final RestClient restClient;
 	private final ApplicationProperties applicationProperties;
 	private final CurrencyValidator currencyValidator;
-
-	public DefaultRatesProvider(
-			RestClient restClient, 
-			ApplicationProperties applicationProperties,
-			CurrencyValidator currencyValidator) {
-		this.restClient = restClient;
-		this.applicationProperties = applicationProperties;
-		this.currencyValidator = currencyValidator;
-	}
 
 	@Override
 	public RatesProviderResponse getRates(String baseCurrency) {

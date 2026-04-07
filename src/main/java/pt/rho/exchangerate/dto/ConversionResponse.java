@@ -3,8 +3,10 @@ package pt.rho.exchangerate.dto;
 import java.math.BigDecimal;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Value;
 
 @Schema(description = "Conversion response for a single target currency")
+@Value
 public class ConversionResponse {
 
 	@Schema(description = "Source currency", example = "USD")
@@ -22,32 +24,4 @@ public class ConversionResponse {
 	@Schema(description = "Converted amount", example = "92.340000")
 	private BigDecimal convertedAmount;
 
-	public ConversionResponse(String from, String to, BigDecimal originalAmount, BigDecimal rate,
-			BigDecimal convertedAmount) {
-		this.from = from;
-		this.to = to;
-		this.originalAmount = originalAmount;
-		this.rate = rate;
-		this.convertedAmount = convertedAmount;
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public String getTo() {
-		return to;
-	}
-
-	public BigDecimal getOriginalAmount() {
-		return originalAmount;
-	}
-
-	public BigDecimal getRate() {
-		return rate;
-	}
-
-	public BigDecimal getConvertedAmount() {
-		return convertedAmount;
-	}
 }

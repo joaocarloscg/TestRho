@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClientException;
 
 import pt.rho.exchangerate.exception.ApiException;
 import pt.rho.exchangerate.exception.InvalidCurrencyException;
+import pt.rho.exchangerate.web.GraphQLErrorHandler;
 
 @ExtendWith(MockitoExtension.class)
 class GraphQLErrorHandlerTests {

@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Value;
 
 @Schema(description = "Conversion response for multiple target currencies")
+@Value
 public class MultiConversionResponse {
 
 	@Schema(description = "Source currency", example = "USD")
@@ -17,22 +19,4 @@ public class MultiConversionResponse {
 	@Schema(description = "List of conversion results")
 	private List<SingleConversionItemResponse> conversions;
 
-	public MultiConversionResponse(String from, BigDecimal originalAmount,
-			List<SingleConversionItemResponse> conversions) {
-		this.from = from;
-		this.originalAmount = originalAmount;
-		this.conversions = conversions;
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public BigDecimal getOriginalAmount() {
-		return originalAmount;
-	}
-
-	public List<SingleConversionItemResponse> getConversions() {
-		return conversions;
-	}
 }

@@ -16,16 +16,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import pt.rho.exchangerate.dto.ConversionResponse;
+import pt.rho.exchangerate.dto.CurrencyRateGraphQlResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
+import pt.rho.exchangerate.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.dto.MultiConversionResponse;
 import pt.rho.exchangerate.dto.SingleConversionItemResponse;
-import pt.rho.exchangerate.graphql.dto.CurrencyRateGraphQlResponse;
-import pt.rho.exchangerate.graphql.dto.ExchangeRatesGraphQlResponse;
+import pt.rho.exchangerate.mapper.GraphQLResponseMapper;
 import pt.rho.exchangerate.model.ConversionResult;
 import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.service.ExchangeRateService;
+import pt.rho.exchangerate.web.controller.ExchangeRateGraphQlController;
 
 @ExtendWith(MockitoExtension.class)
 class ExchangeRateGraphQlControllerTests {

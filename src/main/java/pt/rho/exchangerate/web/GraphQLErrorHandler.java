@@ -1,4 +1,4 @@
-package pt.rho.exchangerate.graphql;
+package pt.rho.exchangerate.web;
 
 import java.util.Map;
 

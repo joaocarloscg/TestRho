@@ -6,11 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.provider.dto.RatesProviderResponse;
 import pt.rho.exchangerate.exception.ExternalProviderException;
 import pt.rho.exchangerate.model.ExchangeRates;
 
 @Component
+@RequiredArgsConstructor
 public class RatesProviderResponseMapper {
 
 	public ExchangeRates toExchangeRates(String baseCurrency, RatesProviderResponse response) {

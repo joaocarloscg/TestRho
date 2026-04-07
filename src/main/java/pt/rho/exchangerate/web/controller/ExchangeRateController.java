@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ErrorResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
@@ -31,16 +32,11 @@ import pt.rho.exchangerate.service.ExchangeRateService;
 @Tag(name = "Exchange Rates", description = "Operations for exchange rates and currency conversion")
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class ExchangeRateController {
 
     private final ExchangeRateService exchangeRateService;
     private final ApiResponseMapper apiResponseMapper;
-
-    public ExchangeRateController(ExchangeRateService exchangeRateService,
-                                  ApiResponseMapper apiResponseMapper) {
-        this.exchangeRateService = exchangeRateService;
-        this.apiResponseMapper = apiResponseMapper;
-    }
 
     @Operation(
             summary = "Get all exchange rates from a base currency",

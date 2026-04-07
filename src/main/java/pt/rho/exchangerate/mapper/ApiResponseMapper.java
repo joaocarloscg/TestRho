@@ -2,6 +2,7 @@ package pt.rho.exchangerate.mapper;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
 import pt.rho.exchangerate.dto.ExchangeRatesResponse;
@@ -13,6 +14,7 @@ import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 
 @Component
+@RequiredArgsConstructor
 public class ApiResponseMapper {
 
     public ExchangeRatesResponse toExchangeRatesResponse(ExchangeRates exchangeRates) {

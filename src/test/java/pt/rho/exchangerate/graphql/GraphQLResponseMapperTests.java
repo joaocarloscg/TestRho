@@ -11,8 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
+import pt.rho.exchangerate.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.dto.MultiConversionResponse;
-import pt.rho.exchangerate.graphql.dto.ExchangeRatesGraphQlResponse;
+import pt.rho.exchangerate.mapper.GraphQLResponseMapper;
 import pt.rho.exchangerate.model.ConversionResult;
 import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;

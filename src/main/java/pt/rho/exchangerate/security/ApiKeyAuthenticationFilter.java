@@ -15,7 +15,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> PUBLIC_PATH_PREFIXES = List.of(
@@ -29,14 +31,6 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationManager authenticationManager;
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final String headerName;
-
-    public ApiKeyAuthenticationFilter(AuthenticationManager authenticationManager,
-            AuthenticationEntryPoint authenticationEntryPoint,
-            String headerName) {
-        this.authenticationManager = authenticationManager;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.headerName = headerName;
-    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

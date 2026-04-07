@@ -12,19 +12,24 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.config.AuthProperties;
 
 @Component
+@RequiredArgsConstructor
 public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
 
-    private final Map<String, AuthProperties.Client> clientsByKey;
+    private final AuthProperties authProperties;
+    private Map<String, AuthProperties.Client> clientsByKey;
 
-    public ApiKeyAuthenticationProvider(AuthProperties authProperties) {
+    @PostConstruct
+    void init() {
         this.clientsByKey = authProperties.getClients().stream()
                 .filter(client -> StringUtils.hasText(client.getKey()))
                 .collect(Collectors.toUnmodifiableMap(AuthProperties.Client::getKey, Function.identity()));
     }
-
+    
     @Override
     public Authentication authenticate(Authentication authentication) {
         String providedKey = (String) authentication.getCredentials();
