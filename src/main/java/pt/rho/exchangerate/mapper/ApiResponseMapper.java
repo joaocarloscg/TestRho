@@ -1,8 +1,9 @@
 package pt.rho.exchangerate.mapper;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import lombok.RequiredArgsConstructor;
+import pt.rho.exchangerate.config.MapStructConfig;
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
 import pt.rho.exchangerate.dto.ExchangeRatesResponse;
@@ -13,50 +14,24 @@ import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 
-@Component
-@RequiredArgsConstructor
-public class ApiResponseMapper {
+@Mapper(config = MapStructConfig.class)
+public interface ApiResponseMapper {
 
-    public ExchangeRatesResponse toExchangeRatesResponse(ExchangeRates exchangeRates) {
-        return new ExchangeRatesResponse(
-                exchangeRates.getBaseCurrency(),
-                exchangeRates.getRates()
-        );
-    }
+    @Mapping(target = "base", source = "baseCurrency")
+    ExchangeRatesResponse toExchangeRatesResponse(ExchangeRates exchangeRates);
 
-    public ExchangeRateResponse toExchangeRateResponse(ExchangeRateResult exchangeRateResult) {
-        return new ExchangeRateResponse(
-                exchangeRateResult.getFromCurrency(),
-                exchangeRateResult.getToCurrency(),
-                exchangeRateResult.getRate()
-        );
-    }
+    @Mapping(target = "from", source = "fromCurrency")
+    @Mapping(target = "to", source = "toCurrency")
+    ExchangeRateResponse toExchangeRateResponse(ExchangeRateResult exchangeRateResult);
 
-    public ConversionResponse toConversionResponse(ConversionResult conversionResult) {
-        return new ConversionResponse(
-                conversionResult.getFromCurrency(),
-                conversionResult.getToCurrency(),
-                conversionResult.getOriginalAmount(),
-                conversionResult.getRate(),
-                conversionResult.getConvertedAmount()
-        );
-    }
+    @Mapping(target = "from", source = "fromCurrency")
+    @Mapping(target = "to", source = "toCurrency")
+    ConversionResponse toConversionResponse(ConversionResult conversionResult);
 
-    public SingleConversionItemResponse toSingleConversionItemResponse(ConversionResult conversionResult) {
-        return new SingleConversionItemResponse(
-                conversionResult.getToCurrency(),
-                conversionResult.getRate(),
-                conversionResult.getConvertedAmount()
-        );
-    }
+    @Mapping(target = "currency", source = "toCurrency")
+    SingleConversionItemResponse toSingleConversionItemResponse(ConversionResult conversionResult);
+
+    @Mapping(target = "from", source = "fromCurrency")
+    MultiConversionResponse toMultiConversionResponse(MultiConversionResult multiConversionResult);
     
-    public MultiConversionResponse toMultiConversionResponse(MultiConversionResult multiConversionResult) {
-        return new MultiConversionResponse(
-                multiConversionResult.getFromCurrency(),
-                multiConversionResult.getOriginalAmount(),
-                multiConversionResult.getConversions().stream()
-                        .map(this::toSingleConversionItemResponse)
-                        .toList()
-        );
-    }
 }

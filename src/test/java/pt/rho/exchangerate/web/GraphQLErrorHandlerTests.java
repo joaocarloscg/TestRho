@@ -1,4 +1,4 @@
-package pt.rho.exchangerate.graphql;
+package pt.rho.exchangerate.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,6 @@ import org.springframework.web.client.RestClientException;
 
 import pt.rho.exchangerate.exception.ApiException;
 import pt.rho.exchangerate.exception.InvalidCurrencyException;
-import pt.rho.exchangerate.web.GraphQLErrorHandler;
 
 @ExtendWith(MockitoExtension.class)
 class GraphQLErrorHandlerTests {

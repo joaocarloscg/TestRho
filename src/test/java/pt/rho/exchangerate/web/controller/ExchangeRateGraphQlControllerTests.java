@@ -1,4 +1,4 @@
-package pt.rho.exchangerate.graphql;
+package pt.rho.exchangerate.web.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -27,7 +27,6 @@ import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.service.ExchangeRateService;
-import pt.rho.exchangerate.web.controller.ExchangeRateGraphQlController;
 
 @ExtendWith(MockitoExtension.class)
 class ExchangeRateGraphQlControllerTests {

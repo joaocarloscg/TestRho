@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
@@ -21,7 +22,7 @@ import pt.rho.exchangerate.model.MultiConversionResult;
 
 class ApiResponseMapperTests {
 
-    private final ApiResponseMapper mapper = new ApiResponseMapper();
+	private final ApiResponseMapper mapper = Mappers.getMapper(ApiResponseMapper.class);
 
     @Test
     @DisplayName("Should map ExchangeRates to ExchangeRatesResponse")

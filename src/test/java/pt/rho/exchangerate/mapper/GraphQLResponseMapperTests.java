@@ -1,4 +1,4 @@
-package pt.rho.exchangerate.graphql;
+package pt.rho.exchangerate.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,12 +8,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
 import pt.rho.exchangerate.dto.ExchangeRatesGraphQlResponse;
 import pt.rho.exchangerate.dto.MultiConversionResponse;
-import pt.rho.exchangerate.mapper.GraphQLResponseMapper;
 import pt.rho.exchangerate.model.ConversionResult;
 import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
@@ -21,7 +21,7 @@ import pt.rho.exchangerate.model.MultiConversionResult;
 
 class GraphQLResponseMapperTests {
 
-    private final GraphQLResponseMapper mapper = new GraphQLResponseMapper();
+	private final GraphQLResponseMapper mapper = Mappers.getMapper(GraphQLResponseMapper.class);
 
     @Test
     @DisplayName("toExchangeRatesGraphQlResponse should sort currencies and apply optional filters")
