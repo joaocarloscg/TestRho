@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClientException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import jakarta.validation.ConstraintViolationException;
 import pt.rho.exchangerate.exception.ApiException;
 
 @ControllerAdvice
@@ -35,6 +36,23 @@ public class GraphQLErrorHandler {
         return graphQlError(
                 "BAD_REQUEST",
                 "Required request parameter '%s' is missing".formatted(ex.getParameterName()),
+                environment);
+    }
+
+    @GraphQlExceptionHandler(ConstraintViolationException.class)
+    public GraphQLError handleConstraintViolationException(
+    		ConstraintViolationException ex,
+            DataFetchingEnvironment environment) {
+        String message = ex.getConstraintViolations().stream()
+                .map(violation -> violation.getMessage())
+                .filter(msg -> msg != null && !msg.isBlank())
+                .distinct()
+                .findFirst()
+                .orElse("Validation failed");
+
+        return graphQlError(
+                "BAD_REQUEST",
+                message,
                 environment);
     }
 

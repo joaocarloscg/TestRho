@@ -3,6 +3,7 @@ package pt.rho.exchangerate.web.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +29,13 @@ import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
 import pt.rho.exchangerate.service.ExchangeRateService;
+import pt.rho.exchangerate.web.validation.CurrencyCode;
 
 @Tag(name = "Exchange Rates", description = "Operations for exchange rates and currency conversion")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Validated
 public class ExchangeRateController {
 
     private final ExchangeRateService exchangeRateService;
@@ -50,7 +53,7 @@ public class ExchangeRateController {
     @GetMapping("/rates")
     public ExchangeRatesResponse getAllRates(
             @Parameter(description = "Base currency code, e.g. USD or EUR")
-            @RequestParam String base) {
+            @RequestParam @CurrencyCode String base) {
 
         ExchangeRates exchangeRates = exchangeRateService.getAllRates(base);
         return apiResponseMapper.toExchangeRatesResponse(exchangeRates);
@@ -68,9 +71,9 @@ public class ExchangeRateController {
     @GetMapping("/rates/{from}/{to}")
     public ExchangeRateResponse getExchangeRate(
             @Parameter(description = "Source currency code, e.g. USD")
-            @PathVariable String from,
+            @PathVariable @CurrencyCode String from,
             @Parameter(description = "Target currency code, e.g. EUR")
-            @PathVariable String to) {
+            @PathVariable @CurrencyCode String to) {
 
         ExchangeRateResult exchangeRateResult = exchangeRateService.getExchangeRate(from, to);
         return apiResponseMapper.toExchangeRateResponse(exchangeRateResult);
@@ -88,9 +91,9 @@ public class ExchangeRateController {
     @GetMapping("/conversions/{from}/{to}")
     public ConversionResponse convert(
             @Parameter(description = "Source currency code, e.g. USD")
-            @PathVariable String from,
+            @PathVariable @CurrencyCode String from,
             @Parameter(description = "Target currency code, e.g. EUR")
-            @PathVariable String to,
+            @PathVariable @CurrencyCode String to,
             @Parameter(description = "Amount to convert", example = "100")
             @RequestParam BigDecimal amount) {
 
@@ -110,11 +113,11 @@ public class ExchangeRateController {
     @GetMapping("/conversions/{from}")
     public MultiConversionResponse convertMultiple(
             @Parameter(description = "Source currency code, e.g. USD")
-            @PathVariable String from,
+            @PathVariable @CurrencyCode String from,
             @Parameter(description = "Amount to convert", example = "100")
             @RequestParam BigDecimal amount,
             @Parameter(description = "List of target currencies, e.g. EUR, GBP, JPY")
-            @RequestParam List<String> to) {
+            @RequestParam List<@CurrencyCode String> to) {
 
         MultiConversionResult multiConversionResult = exchangeRateService.convert(from, to, amount);
         return apiResponseMapper.toMultiConversionResponse(multiConversionResult);

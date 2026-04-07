@@ -23,7 +23,6 @@ import pt.rho.exchangerate.model.ConversionResult;
 import pt.rho.exchangerate.model.ExchangeRateResult;
 import pt.rho.exchangerate.model.ExchangeRates;
 import pt.rho.exchangerate.model.MultiConversionResult;
-import pt.rho.exchangerate.validation.CurrencyValidator;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultExchangeRateServiceTests {
@@ -31,13 +30,11 @@ class DefaultExchangeRateServiceTests {
     @Mock
     private CachedProviderService cachedProviderService;
 
-    private CurrencyValidator currencyValidator;
     private DefaultExchangeRateService exchangeRateService;
 
     @BeforeEach
     void setUp() {
-        currencyValidator = new CurrencyValidator();
-        exchangeRateService = new DefaultExchangeRateService(cachedProviderService, currencyValidator);
+        exchangeRateService = new DefaultExchangeRateService(cachedProviderService);
     }
 
     @Test
@@ -145,51 +142,6 @@ class DefaultExchangeRateServiceTests {
                         new BigDecimal("78.000000"),
                         new BigDecimal("15010.000000")
                 );
-
-        verify(cachedProviderService).getAllRates("USD");
-    }
-
-    @Test
-    @DisplayName("service should normalize currencies before processing")
-    void shouldNormalizeCurrenciesBeforeProcessing() {
-        ExchangeRates exchangeRates = new ExchangeRates(
-                "USD",
-                Map.of("EUR", new BigDecimal("0.92"))
-        );
-
-        when(cachedProviderService.getAllRates("USD")).thenReturn(exchangeRates);
-
-        ExchangeRateResult result = exchangeRateService.getExchangeRate(" usd ", " eur ");
-
-        assertThat(result.getRate()).isEqualByComparingTo("0.92");
-        assertThat(result.getFromCurrency()).isEqualTo("USD");
-        assertThat(result.getToCurrency()).isEqualTo("EUR");
-
-        verify(cachedProviderService).getAllRates("USD");
-    }
-
-    @Test
-    @DisplayName("multi-convert should normalize target currencies")
-    void shouldNormalizeTargetCurrenciesInMultiConversion() {
-        ExchangeRates exchangeRates = new ExchangeRates(
-                "USD",
-                Map.of(
-                        "EUR", new BigDecimal("0.92"),
-                        "GBP", new BigDecimal("0.78")
-                )
-        );
-
-        when(cachedProviderService.getAllRates("USD")).thenReturn(exchangeRates);
-
-        MultiConversionResult result = exchangeRateService.convert(
-                " usd ",
-                List.of(" eur ", "gbp"),
-                new BigDecimal("100")
-        );
-
-        assertThat(result.getConversions())
-                .extracting(ConversionResult::getToCurrency)
-                .containsExactly("EUR", "GBP");
 
         verify(cachedProviderService).getAllRates("USD");
     }

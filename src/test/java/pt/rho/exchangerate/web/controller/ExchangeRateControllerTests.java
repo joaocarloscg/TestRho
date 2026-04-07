@@ -1,12 +1,21 @@
 package pt.rho.exchangerate.web.controller;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestClientException;
 import pt.rho.exchangerate.dto.ConversionResponse;
 import pt.rho.exchangerate.dto.ExchangeRateResponse;
 import pt.rho.exchangerate.dto.ExchangeRatesResponse;
 import pt.rho.exchangerate.dto.MultiConversionResponse;
 import pt.rho.exchangerate.dto.SingleConversionItemResponse;
 import pt.rho.exchangerate.exception.ExchangeRateNotFoundException;
-import pt.rho.exchangerate.exception.InvalidCurrencyException;
 import pt.rho.exchangerate.mapper.ApiResponseMapper;
 import pt.rho.exchangerate.model.ConversionResult;
 import pt.rho.exchangerate.model.ExchangeRateResult;
@@ -17,27 +26,16 @@ import pt.rho.exchangerate.web.ErrorResponseFactory;
 import pt.rho.exchangerate.web.GlobalExceptionHandler;
 import pt.rho.exchangerate.web.RateLimitingFilter;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestClientException;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 
 @WebMvcTest(
         controllers = ExchangeRateController.class,
@@ -59,7 +57,7 @@ class ExchangeRateControllerTests {
     private ApiResponseMapper apiResponseMapper;
 
     @Test
-    @DisplayName("GET /api/v1/rates/{base} should return all rates for base currency")
+    @DisplayName("GET /api/v1/rates?base=USD should return all rates for base currency")
     void shouldReturnAllRates() throws Exception {
         ExchangeRates serviceResult = new ExchangeRates(
                 "USD",
@@ -80,7 +78,7 @@ class ExchangeRateControllerTests {
         when(exchangeRateService.getAllRates("USD")).thenReturn(serviceResult);
         when(apiResponseMapper.toExchangeRatesResponse(serviceResult)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/rates?base=USD"))
+        mockMvc.perform(get("/api/v1/rates").param("base", "USD"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.base").value("USD"))
                 .andExpect(jsonPath("$.rates.EUR").value(0.92))
@@ -91,7 +89,7 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/rates/{from}/{to} should return exchange rate")
+    @DisplayName("GET /api/v1/rates/USD/EUR should return exchange rate")
     void shouldReturnExchangeRate() throws Exception {
         ExchangeRateResult serviceResult =
                 new ExchangeRateResult("USD", "EUR", new BigDecimal("0.92"));
@@ -113,7 +111,7 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/rates/{from}/{to} should return 404 when rate not found")
+    @DisplayName("GET /api/v1/rates/USD/EUR should return 404 when rate not found")
     void shouldReturnNotFoundWhenRateMissing() throws Exception {
         when(exchangeRateService.getExchangeRate("USD", "EUR"))
                 .thenThrow(new ExchangeRateNotFoundException("Exchange rate not found from USD to EUR"));
@@ -124,18 +122,37 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/rates/{from}/{to} should return 400 for invalid currency")
-    void shouldReturnBadRequestForInvalidCurrency() throws Exception {
-        when(exchangeRateService.getExchangeRate("US", "EUR"))
-                .thenThrow(new InvalidCurrencyException("Currency must have exactly 3 characters"));
-
+    @DisplayName("GET /api/v1/rates/US/EUR should return 400 for invalid source currency")
+    void shouldReturnBadRequestForInvalidSourceCurrency() throws Exception {
         mockMvc.perform(get("/api/v1/rates/US/EUR"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Currency must have exactly 3 characters"));
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
     }
 
     @Test
-    @DisplayName("GET /api/v1/conversions/{from}/{to} should convert amount")
+    @DisplayName("GET /api/v1/rates/USD/EURO should return 400 for invalid target currency")
+    void shouldReturnBadRequestForInvalidTargetCurrency() throws Exception {
+        mockMvc.perform(get("/api/v1/rates/USD/EURO"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/rates?base=EU should return 400 for invalid base currency")
+    void shouldReturnBadRequestForInvalidBaseCurrency() throws Exception {
+        mockMvc.perform(get("/api/v1/rates").param("base", "EU"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/conversions/USD/EUR?amount=100 should convert amount")
     void shouldConvertAmount() throws Exception {
         ConversionResult serviceResult = new ConversionResult(
                 "USD",
@@ -172,7 +189,29 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/conversions/{from} should convert to multiple currencies")
+    @DisplayName("GET /api/v1/conversions/US/EUR should return 400 for invalid source currency")
+    void shouldReturnBadRequestForInvalidConversionSourceCurrency() throws Exception {
+        mockMvc.perform(get("/api/v1/conversions/US/EUR")
+                        .param("amount", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/conversions/USD/EU should return 400 for invalid target currency")
+    void shouldReturnBadRequestForInvalidConversionTargetCurrency() throws Exception {
+        mockMvc.perform(get("/api/v1/conversions/USD/EU")
+                        .param("amount", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/conversions/USD?amount=100&to=EUR&to=GBP should convert to multiple currencies")
     void shouldConvertMultipleCurrencies() throws Exception {
         MultiConversionResult serviceResult = new MultiConversionResult(
                 "USD",
@@ -186,8 +225,9 @@ class ExchangeRateControllerTests {
         MultiConversionResponse response = new MultiConversionResponse(
                 "USD",
                 new BigDecimal("100"),
-                List.of(new SingleConversionItemResponse("EUR", new BigDecimal("0.92"), new BigDecimal("92.000000")),
-                		new SingleConversionItemResponse("GBP", new BigDecimal("0.78"), new BigDecimal("78.000000"))
+                List.of(
+                        new SingleConversionItemResponse("EUR", new BigDecimal("0.92"), new BigDecimal("92.000000")),
+                        new SingleConversionItemResponse("GBP", new BigDecimal("0.78"), new BigDecimal("78.000000"))
                 )
         );
 
@@ -218,22 +258,44 @@ class ExchangeRateControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/v1/rates/{base} should return 502 when external provider fails")
+    @DisplayName("GET /api/v1/conversions/USD?amount=100&to=EU should return 400 for invalid target currency list item")
+    void shouldReturnBadRequestForInvalidMultiConversionTargetCurrency() throws Exception {
+        mockMvc.perform(get("/api/v1/conversions/USD")
+                        .param("amount", "100")
+                        .param("to", "EU"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Currency must be a 3-letter ISO-style code"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/conversions/USD should return 400 when target currencies are missing")
+    void shouldReturnBadRequestWhenTargetCurrenciesAreMissing() throws Exception {
+        mockMvc.perform(get("/api/v1/conversions/USD")
+                        .param("amount", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Required request parameter 'to' is missing"));
+
+        verifyNoInteractions(exchangeRateService);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/rates?base=USD should return 502 when external provider fails")
     void shouldReturnBadGatewayWhenExternalProviderFails() throws Exception {
         when(exchangeRateService.getAllRates("USD"))
                 .thenThrow(new RestClientException("Provider unavailable"));
 
-        mockMvc.perform(get("/api/v1/rates?base=USD"))
+        mockMvc.perform(get("/api/v1/rates").param("base", "USD"))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.status").value(502))
                 .andExpect(jsonPath("$.error").value("Bad Gateway"))
-                .andExpect(jsonPath("$.message")
-                        .value("Failed to retrieve data from external exchange rate provider"))
+                .andExpect(jsonPath("$.message").value("Failed to retrieve data from external exchange rate provider"))
                 .andExpect(jsonPath("$.path").value("/api/v1/rates"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/rates/{from}/{to} should return 500 for unexpected exception")
+    @DisplayName("GET /api/v1/rates/USD/EUR should return 500 for unexpected exception")
     void shouldReturnInternalServerErrorForUnexpectedException() throws Exception {
         when(exchangeRateService.getExchangeRate("USD", "EUR"))
                 .thenThrow(new RuntimeException("Unexpected"));

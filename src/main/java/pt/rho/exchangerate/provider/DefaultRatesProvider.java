@@ -6,8 +6,8 @@ import org.springframework.web.client.RestClient;
 import lombok.RequiredArgsConstructor;
 import pt.rho.exchangerate.config.ApplicationProperties;
 import pt.rho.exchangerate.provider.dto.RatesProviderResponse;
+import pt.rho.exchangerate.web.validation.CurrencyCode;
 import pt.rho.exchangerate.exception.ExternalProviderException;
-import pt.rho.exchangerate.validation.CurrencyValidator;
 
 @Component
 @RequiredArgsConstructor
@@ -15,17 +15,14 @@ public class DefaultRatesProvider implements RatesProvider {
 
 	private final RestClient restClient;
 	private final ApplicationProperties applicationProperties;
-	private final CurrencyValidator currencyValidator;
 
 	@Override
-	public RatesProviderResponse getRates(String baseCurrency) {
-		String normalizedBaseCurrency = currencyValidator.validateAndNormalize(baseCurrency);
-
+	public RatesProviderResponse getRates(@CurrencyCode String baseCurrency) {
 		RatesProviderResponse response = restClient.get()
 				.uri(uriBuilder -> uriBuilder
 						.path("/live")
 						.queryParam("access_key", applicationProperties.getAccessKey())
-						.queryParam("source", normalizedBaseCurrency)
+						.queryParam("source", baseCurrency)
 						.build())
 				.retrieve()
 				.body(RatesProviderResponse.class);
